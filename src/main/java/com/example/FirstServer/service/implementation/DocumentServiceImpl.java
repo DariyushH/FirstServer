@@ -26,26 +26,50 @@ public class DocumentServiceImpl implements DocumentService {
             while ((entry = zin.getNextEntry()) != null) {
 
                 System.out.printf("File name: %s \n", entry.getName());
-                if(entry.getName().equals("PayDocs.xml")){
-                    String str = IOUtils.toString(zin, StandardCharsets.UTF_8);
-                    StringReader reader = new StringReader(str);
-                    JAXBContext context = JAXBContext.newInstance(PayDoc.class);
-                    PayDoc payDoc = (PayDoc) context.createUnmarshaller()
-                            .unmarshal(reader);
-                    for (DocPayDoc doc : payDoc.documentList) {
-                        System.out.println(doc.toString());
+                switch (entry.getName()) {
+                    case "PayDocs.xml":{
+                        String str = IOUtils.toString(zin, StandardCharsets.UTF_8);
+                        StringReader reader = new StringReader(str);
+                        JAXBContext context = JAXBContext.newInstance(PayDoc.class);
+                        PayDoc payDoc = (PayDoc) context.createUnmarshaller()
+                                .unmarshal(reader);
+                        for (DocPayDoc doc : payDoc.documentList) {
+                            System.out.println(doc.toString());
+                        }
+                        break;
+                     }
+                    case "Report.xml": {
+                        String str = IOUtils.toString(zin, StandardCharsets.UTF_8);
+                        StringReader reader = new StringReader(str);
+                        JAXBContext context = JAXBContext.newInstance(ReportDoc.class);
+                        ReportDoc reportDoc = (ReportDoc) context.createUnmarshaller()
+                                .unmarshal(reader);
+                        for (DocReport doc : reportDoc.documentList) {
+                            System.out.println(doc.toString());
+                        }
+                        break;
                     }
                 }
-                if(entry.getName().equals("Report.xml")){
-                    String str = IOUtils.toString(zin, StandardCharsets.UTF_8);
-                    StringReader reader = new StringReader(str);
-                    JAXBContext context = JAXBContext.newInstance(ReportDoc.class);
-                    ReportDoc reportDoc = (ReportDoc) context.createUnmarshaller()
-                            .unmarshal(reader);
-                    for (DocReport doc : reportDoc.documentList) {
-                        System.out.println(doc.toString());
-                    }
-                }
+//                if(entry.getName().equals("PayDocs.xml")){
+//                    String str = IOUtils.toString(zin, StandardCharsets.UTF_8);
+//                    StringReader reader = new StringReader(str);
+//                    JAXBContext context = JAXBContext.newInstance(PayDoc.class);
+//                    PayDoc payDoc = (PayDoc) context.createUnmarshaller()
+//                            .unmarshal(reader);
+//                    for (DocPayDoc doc : payDoc.documentList) {
+//                        System.out.println(doc.toString());
+//                    }
+//                }
+//                if(entry.getName().equals("Report.xml")){
+//                    String str = IOUtils.toString(zin, StandardCharsets.UTF_8);
+//                    StringReader reader = new StringReader(str);
+//                    JAXBContext context = JAXBContext.newInstance(ReportDoc.class);
+//                    ReportDoc reportDoc = (ReportDoc) context.createUnmarshaller()
+//                            .unmarshal(reader);
+//                    for (DocReport doc : reportDoc.documentList) {
+//                        System.out.println(doc.toString());
+//                    }
+//                }
             }
         } catch (IOException | JAXBException e) {
             throw new RuntimeException(e);
