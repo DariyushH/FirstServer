@@ -28,7 +28,7 @@ public class MainController {
     }
 
     @PostMapping()
-    public String sendPostRequest(@RequestParam("file") MultipartFile file) {
+    public String sendPostRequest(@RequestParam("file") MultipartFile file) throws Exception {
         if (file != null) {
             documentService.unpack(file);
         } else {

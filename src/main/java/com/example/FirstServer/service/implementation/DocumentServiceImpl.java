@@ -1,8 +1,9 @@
 package com.example.FirstServer.service.implementation;
 
+import com.example.FirstServer.enums.DocType;
+import com.example.FirstServer.model.main.MainDocument;
 import com.example.FirstServer.model.paydocs.DocPayDoc;
 import com.example.FirstServer.model.paydocs.PayDoc;
-import com.example.FirstServer.model.report.DocReport;
 import com.example.FirstServer.model.report.ReportDoc;
 import com.example.FirstServer.service.DocumentService;
 import jakarta.xml.bind.JAXBContext;
@@ -13,47 +14,46 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
     @Override
-    public void unpack(MultipartFile file) {
+    public void unpack(MultipartFile file) throws Exception {
+        PayDoc payDocList = (PayDoc) parseXML(file, DocType.PAYDOC);
+        ReportDoc reportDocList = (ReportDoc) parseXML(file, DocType.REPORT);
+        List<MainDocument> mainDocuments = new ArrayList<>();
+        if (payDocList != null && reportDocList != null) {
+            for (DocPayDoc docPayDoc : payDocList.getAll()) {
+                mainDocuments.add(new MainDocument(docPayDoc, reportDocList.getByGUID(docPayDoc.getGUID())));
+            }
+        }
+        for (MainDocument doc : mainDocuments) {
+            System.out.println(doc);
+        }
+    }
+
+    private Object parseXML(MultipartFile file, DocType type) throws IOException, JAXBException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Object doc = type.getRequiredClass().getDeclaredConstructor().newInstance();
         try (ZipInputStream zin = new ZipInputStream(file.getInputStream())) {
             ZipEntry entry;
             while ((entry = zin.getNextEntry()) != null) {
-
-                System.out.printf("File name: %s \n", entry.getName());
-                switch (entry.getName()) {
-                    case "PayDocs.xml":{
-                        String str = IOUtils.toString(zin, StandardCharsets.UTF_8);
-                        StringReader reader = new StringReader(str);
-                        JAXBContext context = JAXBContext.newInstance(PayDoc.class);
-                        PayDoc payDoc = (PayDoc) context.createUnmarshaller()
-                                .unmarshal(reader);
-                        for (DocPayDoc doc : payDoc.documentList) {
-                            System.out.println(doc.toString());
-                        }
-                        break;
-                     }
-                    case "Report.xml": {
-                        String str = IOUtils.toString(zin, StandardCharsets.UTF_8);
-                        StringReader reader = new StringReader(str);
-                        JAXBContext context = JAXBContext.newInstance(ReportDoc.class);
-                        ReportDoc reportDoc = (ReportDoc) context.createUnmarshaller()
-                                .unmarshal(reader);
-                        for (DocReport doc : reportDoc.documentList) {
-                            System.out.println(doc.toString());
-                        }
-                        break;
-                    }
+                String fileName = entry.getName();
+                if (fileName.equals(type.getFileName())) {
+                    System.out.printf("File name: %s \n", entry.getName());
+                    String str = IOUtils.toString(zin, StandardCharsets.UTF_8);
+                    StringReader reader = new StringReader(str);
+                    JAXBContext context = JAXBContext.newInstance(type.getRequiredClass());
+                    doc = context.createUnmarshaller()
+                      .unmarshal(reader);
                 }
             }
-        } catch (IOException | JAXBException e) {
-            throw new RuntimeException(e);
         }
-
+        return doc;
     }
 }
