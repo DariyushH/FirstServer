@@ -8,6 +8,7 @@ import com.example.FirstServer.model.report.ReportDoc;
 import com.example.FirstServer.service.DocumentService;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,21 +39,26 @@ public class DocumentServiceImpl implements DocumentService {
         }
     }
 
-    private Object parseXML(MultipartFile file, DocType type) throws IOException, JAXBException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    private Object parseXML(MultipartFile file, DocType type) throws Exception {
         Object doc = type.getRequiredClass().getDeclaredConstructor().newInstance();
         try (ZipInputStream zin = new ZipInputStream(file.getInputStream())) {
             ZipEntry entry;
             while ((entry = zin.getNextEntry()) != null) {
-                String fileName = entry.getName();
-                if (fileName.equals(type.getFileName())) {
-                    System.out.printf("File name: %s \n", entry.getName());
-                    String str = IOUtils.toString(zin, StandardCharsets.UTF_8);
+                String str = IOUtils.toString(zin, StandardCharsets.UTF_8);
+                if (entry.getName().equals(type.getFileName())) {
                     StringReader reader = new StringReader(str);
-                    JAXBContext context = JAXBContext.newInstance(type.getRequiredClass());
-                    doc = context.createUnmarshaller()
-                      .unmarshal(reader);
+                    try {
+                        JAXBContext context = JAXBContext.newInstance(type.getRequiredClass());
+                        Unmarshaller unmarshaller = context.createUnmarshaller();
+                        doc = unmarshaller.unmarshal(reader);
+                    } catch (JAXBException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+            System.out.println("while ended");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return doc;
     }
