@@ -6,13 +6,12 @@ import jakarta.xml.bind.annotation.XmlElement;
 import lombok.Data;
 
 @Data
-
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ParticipantInfo {
     @XmlElement(name = "INN_PAY")
-    private String innPay;
+    private String inn;
     @XmlElement(name = "KPP_PAY")
-    private String kppPay;
-    @XmlElement(name = "cName_PAY")
-    private String cNamePay;
+    private String kpp;
+    @XmlElement(name = "CName_PAY")
+    private String name;
 }

@@ -15,7 +15,7 @@ public class MainDocument {
     private String docDate;
     private String docGUID;
     private String operationType;
-    private Double amountOut;
+    private Double amount;
     /** Аттрибуты из PayDoc **/
     private ParticipantInfo receiverInfo;
     private ParticipantInfo payerInfo;
@@ -28,7 +28,7 @@ public class MainDocument {
         docDate = reportDoc.getDocDate();
         docGUID = reportDoc.getDocGUID();
         operationType = reportDoc.getOperType();
-        amountOut = reportDoc.getAmountOut();
+        amount = reportDoc.getAmountOut();
         receiverInfo = docPayDoc.getInfRcp();
         payerInfo = docPayDoc.getInfPay();
         receiverBankInfo = docPayDoc.getBankRcp();

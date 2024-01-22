@@ -9,9 +9,9 @@ import lombok.Data;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class BankInfo {
     @XmlElement(name = "BS_PAY")
-    private String bsPay;
+    private String bs;
     @XmlElement(name = "BIC_PAY")
-    private String bicPAy;
+    private String bic;
     @XmlElement(name = "BS_KS_PAY")
-    private String bsKsPay;
+    private String bsKs;
 }

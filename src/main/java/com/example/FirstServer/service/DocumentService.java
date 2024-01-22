@@ -1,11 +1,10 @@
 package com.example.FirstServer.service;
 
-import jakarta.xml.bind.JAXBException;
+import com.example.FirstServer.model.main.MainDocument;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 public interface DocumentService {
-    void unpack(MultipartFile file) throws  Exception;
+    List<MainDocument> unpack(MultipartFile file) throws  Exception;
 }

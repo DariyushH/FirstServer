@@ -20,9 +20,8 @@ public class ReportDoc {
 
     public DocReport getByGUID(String guid) throws Exception {
         return documentList.stream()
-          .filter(report -> report.getDocGUID().equals(guid))
-          .findFirst()
-          .orElseThrow(Exception::new);
+                .filter(report -> report.getDocGUID().equals(guid))
+                .findFirst()
+                .orElseThrow(Exception::new);
     }
 }
-

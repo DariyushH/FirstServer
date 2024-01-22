@@ -9,13 +9,13 @@ import com.example.FirstServer.service.DocumentService;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import lombok.Value;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ import java.util.zip.ZipInputStream;
 @Service
 public class DocumentServiceImpl implements DocumentService {
     @Override
-    public void unpack(MultipartFile file) throws Exception {
+    public List<MainDocument> unpack(MultipartFile file) throws Exception {
         PayDoc payDocList = (PayDoc) parseXML(file, DocType.PAYDOC);
         ReportDoc reportDocList = (ReportDoc) parseXML(file, DocType.REPORT);
         List<MainDocument> mainDocuments = new ArrayList<>();
@@ -34,9 +34,7 @@ public class DocumentServiceImpl implements DocumentService {
                 mainDocuments.add(new MainDocument(docPayDoc, reportDocList.getByGUID(docPayDoc.getGUID())));
             }
         }
-        for (MainDocument doc : mainDocuments) {
-            System.out.println(doc);
-        }
+        return mainDocuments;
     }
 
     private Object parseXML(MultipartFile file, DocType type) throws Exception {
